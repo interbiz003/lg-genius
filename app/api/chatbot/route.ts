@@ -15,18 +15,21 @@ function makeResponse(item: FaqItem) {
   const hasUrl1 = item.url && item.url.trim() !== '';
   const hasUrl2 = item.url2 && item.url2.trim() !== '';
 
-  // URL 2개 → BasicCard (링크 버튼 2개)
-  if (hasUrl1 && hasUrl2) {
+  // URL 1개 이상 → BasicCard (링크 버튼 1~2개)
+  if (hasUrl1) {
+    const buttons = [
+      { label: item.urlButton || '상세보기', action: 'webLink', webLinkUrl: item.url },
+    ];
+    if (hasUrl2) {
+      buttons.push({ label: item.url2ButtonName || '상세보기', action: 'webLink', webLinkUrl: item.url2 });
+    }
     return {
       version: '2.0',
       template: {
         outputs: [{
           basicCard: {
             description: item.answer,
-            buttons: [
-              { label: item.urlButton || '상세보기', action: 'webLink', webLinkUrl: item.url },
-              { label: item.url2ButtonName || '상세보기', action: 'webLink', webLinkUrl: item.url2 },
-            ],
+            buttons,
           },
         }],
         ...(quickReplies.length > 0 ? { quickReplies } : {}),
@@ -34,16 +37,11 @@ function makeResponse(item: FaqItem) {
     };
   }
 
-  // URL 0~1개 → 기존 simpleText 방식
-  let text = item.answer;
-  if (hasUrl1) {
-    text += `\n\n🔗 ${item.urlButton || '상세보기'}: ${item.url}`;
-  }
-
+  // URL 없음 → 기존 simpleText 방식
   return {
     version: '2.0',
     template: {
-      outputs: [{ simpleText: { text } }],
+      outputs: [{ simpleText: { text: item.answer } }],
       ...(quickReplies.length > 0 ? { quickReplies } : {}),
     },
   };
