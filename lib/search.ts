@@ -13,6 +13,8 @@ export interface FaqItem {
   answer: string;
   url: string;
   urlButton: string;
+  url2: string;
+  url2ButtonName: string;
   quickButtons?: QuickButton[];
 }
 
@@ -32,6 +34,8 @@ const faqData: FaqItem[] = (rawFaqData as any[]).map(item => {
     ...item,
     url: item.url || '',
     urlButton: item.urlButtonName || item.urlButton || '',
+    url2: item.url2 || '',
+    url2ButtonName: item.url2ButtonName || '',
     quickButtons: quickButtons.length > 0 ? quickButtons : undefined,
   };
 });

@@ -6,17 +6,39 @@ import { searchPrice, formatPriceResponse, looksLikeModelName } from '../../../l
 // 응답 생성 (faq.json quickButtons 기반)
 // ═══════════════════════════════════════
 function makeResponse(item: FaqItem) {
-  let text = item.answer;
-
-  if (item.url && item.url.trim() !== '') {
-    text += `\n\n🔗 ${item.urlButton || '상세보기'}: ${item.url}`;
-  }
-
   const quickReplies = (item.quickButtons || []).map(btn => ({
     messageText: btn.text,
     action: 'message' as const,
     label: btn.label.length > 14 ? btn.label.substring(0, 14) + '..' : btn.label,
   }));
+
+  const hasUrl1 = item.url && item.url.trim() !== '';
+  const hasUrl2 = item.url2 && item.url2.trim() !== '';
+
+  // URL 2개 → BasicCard (링크 버튼 2개)
+  if (hasUrl1 && hasUrl2) {
+    return {
+      version: '2.0',
+      template: {
+        outputs: [{
+          basicCard: {
+            description: item.answer,
+            buttons: [
+              { label: item.urlButton || '상세보기', action: 'webLink', webLinkUrl: item.url },
+              { label: item.url2ButtonName || '상세보기', action: 'webLink', webLinkUrl: item.url2 },
+            ],
+          },
+        }],
+        ...(quickReplies.length > 0 ? { quickReplies } : {}),
+      },
+    };
+  }
+
+  // URL 0~1개 → 기존 simpleText 방식
+  let text = item.answer;
+  if (hasUrl1) {
+    text += `\n\n🔗 ${item.urlButton || '상세보기'}: ${item.url}`;
+  }
 
   return {
     version: '2.0',

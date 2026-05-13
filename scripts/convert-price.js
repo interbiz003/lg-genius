@@ -94,8 +94,8 @@ for (const sheetName of sheets) {
     }
 
     const item = modelMap[key];
-    const finalPrice = safeNum(row[11]);
-    const activation = safeNum(row[10]);
+    const finalPrice = safeNum(row[12]);     // M열: 최종요금 (기존 L→M)
+    const activation = safeNum(row[11]);     // L열: 활성화 (기존 K→L)
 
     if (activation) item.activation = activation;
 
@@ -104,10 +104,10 @@ for (const sheetName of sheets) {
     else if (period === '60') item.price5y = finalPrice;
     else if (period === '72') {
       item.price6y = finalPrice;
-      item.prepay30_lump = safeNum(row[12]);
-      item.prepay30_monthly = safeNum(row[13]);
-      item.prepay50_lump = safeNum(row[14]);
-      item.prepay50_monthly = safeNum(row[15]);
+      item.prepay30_lump = safeNum(row[13]);     // N열 (기존 M→N)
+      item.prepay30_monthly = safeNum(row[14]);   // O열 (기존 N→O)
+      item.prepay50_lump = safeNum(row[15]);     // P열 (기존 O→P)
+      item.prepay50_monthly = safeNum(row[16]);   // Q열 (기존 P→Q)
     }
   }
 }
