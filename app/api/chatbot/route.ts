@@ -15,20 +15,22 @@ function makeResponse(item: FaqItem) {
   const hasUrl1 = item.url && item.url.trim() !== '';
   const hasUrl2 = item.url2 && item.url2.trim() !== '';
 
-  // URL 1개 이상 → BasicCard (링크 버튼 1~2개)
+  // URL 1개 이상 → ListCard (링크 버튼 1~2개)
   if (hasUrl1) {
+    const truncateLabel = (s: string) => s.length > 14 ? s.substring(0, 13) + '..' : s;
     const buttons = [
-      { label: item.urlButton || '상세보기', action: 'webLink', webLinkUrl: item.url },
+      { label: truncateLabel(item.urlButton || '상세보기'), action: 'webLink', webLinkUrl: item.url },
     ];
     if (hasUrl2) {
-      buttons.push({ label: item.url2ButtonName || '상세보기', action: 'webLink', webLinkUrl: item.url2 });
+      buttons.push({ label: truncateLabel(item.url2ButtonName || '상세보기'), action: 'webLink', webLinkUrl: item.url2 });
     }
     return {
       version: '2.0',
       template: {
         outputs: [{
-          basicCard: {
-            description: item.answer,
+          listCard: {
+            header: { title: item.question },
+            items: [{ title: item.answer }],
             buttons,
           },
         }],
