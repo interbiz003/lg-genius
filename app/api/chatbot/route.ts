@@ -15,9 +15,10 @@ function makeResponse(item: FaqItem) {
   const hasUrl1 = item.url && item.url.trim() !== '';
   const hasUrl2 = item.url2 && item.url2.trim() !== '';
 
-  // URL 1개 이상 → ListCard (링크 버튼 1~2개)
+  // URL 1개 이상 → BasicCard (thumbnail + 링크 버튼 1~2개)
   if (hasUrl1) {
     const truncateLabel = (s: string) => s.length > 14 ? s.substring(0, 13) + '..' : s;
+    const description = item.answer.length > 230 ? item.answer.substring(0, 227) + '...' : item.answer;
     const buttons = [
       { label: truncateLabel(item.urlButton || '상세보기'), action: 'webLink', webLinkUrl: item.url },
     ];
@@ -28,9 +29,9 @@ function makeResponse(item: FaqItem) {
       version: '2.0',
       template: {
         outputs: [{
-          listCard: {
-            header: { title: item.question },
-            items: [{ title: item.answer }],
+          basicCard: {
+            thumbnail: { imageUrl: item.url },
+            description,
             buttons,
           },
         }],
