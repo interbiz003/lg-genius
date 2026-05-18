@@ -61,11 +61,15 @@ for (const sheetName of sheets) {
     if (!modelFull) continue;
 
     const product = String(row[0] || '').trim();
-    const careType = String(row[2] || '').trim();
-    const careDetail = String(row[3] || '').trim();
-    const visitCycle = String(row[4] || '').trim();
-    const period = String(row[5] || '').trim();
-    const combType = String(row[6] || '').trim();
+    const hiPlazaVal = String(row[2] || '').trim().toUpperCase();
+    const dotcomVal = String(row[3] || '').trim();
+    const isHiPlaza = hiPlazaVal === 'H';
+    const isDotcom = dotcomVal === 'O' || dotcomVal === 'o' || dotcomVal === 'ㅇ';
+    const careType = String(row[4] || '').trim();
+    const careDetail = String(row[5] || '').trim();
+    const visitCycle = String(row[6] || '').trim();
+    const period = String(row[7] || '').trim();
+    const combType = String(row[8] || '').trim();
 
     // 결합없음만 기본으로 사용 (중복 방지)
     if (combType !== '결합없음') continue;
@@ -81,6 +85,8 @@ for (const sheetName of sheets) {
         careDetail,
         visitCycle,
         careCombined,
+        isHiPlaza,
+        isDotcom,
         activation: null,
         price3y: null,
         price4y: null,
@@ -94,8 +100,8 @@ for (const sheetName of sheets) {
     }
 
     const item = modelMap[key];
-    const finalPrice = safeNum(row[12]);     // M열: 최종요금 (기존 L→M)
-    const activation = safeNum(row[11]);     // L열: 활성화 (기존 K→L)
+    const finalPrice = safeNum(row[14]);     // O열: 최종요금
+    const activation = safeNum(row[13]);     // N열: 활성화
 
     if (activation) item.activation = activation;
 
@@ -104,10 +110,10 @@ for (const sheetName of sheets) {
     else if (period === '60') item.price5y = finalPrice;
     else if (period === '72') {
       item.price6y = finalPrice;
-      item.prepay30_lump = safeNum(row[13]);     // N열 (기존 M→N)
-      item.prepay30_monthly = safeNum(row[14]);   // O열 (기존 N→O)
-      item.prepay50_lump = safeNum(row[15]);     // P열 (기존 O→P)
-      item.prepay50_monthly = safeNum(row[16]);   // Q열 (기존 P→Q)
+      item.prepay30_lump = safeNum(row[15]);     // P열: 선납30%금액
+      item.prepay30_monthly = safeNum(row[16]);   // Q열: 선납30%최종
+      item.prepay50_lump = safeNum(row[17]);     // R열: 선납50%금액
+      item.prepay50_monthly = safeNum(row[18]);   // S열: 선납50%최종
     }
   }
 }

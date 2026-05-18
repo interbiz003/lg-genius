@@ -12,6 +12,8 @@ interface PriceItem {
   careDetail: string;
   visitCycle: string;
   careCombined: string;
+  isHiPlaza: boolean;
+  isDotcom: boolean;
   activation: number | null;
   price3y: number | null;
   price4y: number | null;
@@ -150,6 +152,13 @@ export function formatPriceResponse(item: PriceItem): string {
   const lines: string[] = [];
 
   lines.push(`📦 ${item.product} | ${item.modelFull}`);
+  if (item.isHiPlaza && item.isDotcom) {
+    lines.push('🏪 하이프라자 | 닷컴 운영모델');
+  } else if (item.isHiPlaza) {
+    lines.push('🏪 하이프라자 운영모델');
+  } else if (item.isDotcom) {
+    lines.push('🌐 닷컴 운영모델');
+  }
   lines.push(`🔧 케어십: ${item.careCombined}`);
   if (priceDate) {
     lines.push(`📅 ${priceDate} 기준`);
