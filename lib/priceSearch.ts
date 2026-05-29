@@ -19,6 +19,11 @@ interface PriceItem {
   price4y: number | null;
   price5y: number | null;
   price6y: number | null;
+  price6y_new: number | null;
+  price6y_exist: number | null;
+  price6y_smb1: number | null;
+  price6y_smb2: number | null;
+  price6y_smb4: number | null;
   prepay30_lump: number | null;
   prepay30_monthly: number | null;
   prepay50_lump: number | null;
@@ -178,13 +183,23 @@ export function formatPriceResponse(item: PriceItem): string {
 
   if (item.prepay30_monthly || item.prepay50_monthly) {
     lines.push('');
-    lines.push('📋 선납 시');
+    lines.push('📋 선납 시 (6년 기준)');
     if (item.prepay30_lump && item.prepay30_monthly) {
       lines.push(`  • 30%: 선납금 ${formatPrice(item.prepay30_lump)} / 월 ${formatPrice(item.prepay30_monthly)}`);
     }
     if (item.prepay50_lump && item.prepay50_monthly) {
       lines.push(`  • 50%: 선납금 ${formatPrice(item.prepay50_lump)} / 월 ${formatPrice(item.prepay50_monthly)}`);
     }
+  }
+
+  if (item.price6y_new) {
+    lines.push('');
+    lines.push('🤝 결합할인 (6년 기준)');
+    lines.push(`  • 신규결합: ${formatPrice(item.price6y_new)}`);
+    if (item.price6y_exist) lines.push(`  • 기존결합: ${formatPrice(item.price6y_exist)}`);
+    if (item.price6y_smb1) lines.push(`  • 소상공인 1대: ${formatPrice(item.price6y_smb1)}`);
+    if (item.price6y_smb2) lines.push(`  • 소상공인 2대이상: ${formatPrice(item.price6y_smb2)}`);
+    if (item.price6y_smb4) lines.push(`  • 소상공인 4대이상: ${formatPrice(item.price6y_smb4)}`);
   }
 
   return lines.join('\n');

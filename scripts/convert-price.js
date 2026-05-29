@@ -70,9 +70,7 @@ for (const sheetName of sheets) {
     const visitCycle = String(row[6] || '').trim();
     const period = String(row[7] || '').trim();
     const combType = String(row[8] || '').trim();
-
-    // 결합없음만 기본으로 사용 (중복 방지)
-    if (combType !== '결합없음') continue;
+    const smbDetail = String(row[9] || '').trim();   // J열: 소상공인구분
 
     const careCombined = [careType, careDetail, visitCycle].filter(v => v).join(' > ');
     const key = `${modelFull}|${careCombined}`;
@@ -92,6 +90,11 @@ for (const sheetName of sheets) {
         price4y: null,
         price5y: null,
         price6y: null,
+        price6y_new: null,
+        price6y_exist: null,
+        price6y_smb1: null,
+        price6y_smb2: null,
+        price6y_smb4: null,
         prepay30_lump: null,
         prepay30_monthly: null,
         prepay50_lump: null,
@@ -100,20 +103,30 @@ for (const sheetName of sheets) {
     }
 
     const item = modelMap[key];
-    const finalPrice = safeNum(row[14]);     // O열: 최종요금
-    const activation = safeNum(row[13]);     // N열: 활성화
+    const finalPrice = safeNum(row[15]);     // P열: 최종요금
+    const activation = safeNum(row[14]);     // O열: 활성화
 
-    if (activation) item.activation = activation;
+    if (combType === '결합없음') {
+      if (activation) item.activation = activation;
 
-    if (period === '36') item.price3y = finalPrice;
-    else if (period === '48') item.price4y = finalPrice;
-    else if (period === '60') item.price5y = finalPrice;
-    else if (period === '72') {
-      item.price6y = finalPrice;
-      item.prepay30_lump = safeNum(row[15]);     // P열: 선납30%금액
-      item.prepay30_monthly = safeNum(row[16]);   // Q열: 선납30%최종
-      item.prepay50_lump = safeNum(row[17]);     // R열: 선납50%금액
-      item.prepay50_monthly = safeNum(row[18]);   // S열: 선납50%최종
+      if (period === '36') item.price3y = finalPrice;
+      else if (period === '48') item.price4y = finalPrice;
+      else if (period === '60') item.price5y = finalPrice;
+      else if (period === '72') {
+        item.price6y = finalPrice;
+        item.prepay30_lump = safeNum(row[16]);     // Q열: 선납30%금액
+        item.prepay30_monthly = safeNum(row[17]);   // R열: 선납30%최종
+        item.prepay50_lump = safeNum(row[18]);     // S열: 선납50%금액
+        item.prepay50_monthly = safeNum(row[19]);   // T열: 선납50%최종
+      }
+    } else if (period === '72') {
+      if (combType === '신규결합') item.price6y_new = finalPrice;
+      else if (combType === '기존결합') item.price6y_exist = finalPrice;
+      else if (combType === '소상공인') {
+        if (smbDetail === '1대') item.price6y_smb1 = finalPrice;
+        else if (smbDetail === '2대이상') item.price6y_smb2 = finalPrice;
+        else if (smbDetail === '4대이상') item.price6y_smb4 = finalPrice;
+      }
     }
   }
 }
