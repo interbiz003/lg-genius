@@ -103,8 +103,8 @@ for (const sheetName of sheets) {
     }
 
     const item = modelMap[key];
-    const finalPrice = safeNum(row[15]);     // P열: 최종요금
-    const activation = safeNum(row[14]);     // O열: 활성화
+    const finalPrice = safeNum(row[14]);     // O열: 최종요금
+    const activation = safeNum(row[13]);     // N열: 활성화
 
     if (combType === '결합없음') {
       if (activation) item.activation = activation;
@@ -114,10 +114,10 @@ for (const sheetName of sheets) {
       else if (period === '60') item.price5y = finalPrice;
       else if (period === '72') {
         item.price6y = finalPrice;
-        item.prepay30_lump = safeNum(row[16]);     // Q열: 선납30%금액
-        item.prepay30_monthly = safeNum(row[17]);   // R열: 선납30%최종
-        item.prepay50_lump = safeNum(row[18]);     // S열: 선납50%금액
-        item.prepay50_monthly = safeNum(row[19]);   // T열: 선납50%최종
+        item.prepay30_lump = safeNum(row[15]);     // P열: 선납30%금액
+        item.prepay30_monthly = safeNum(row[16]);   // Q열: 선납30%최종
+        item.prepay50_lump = safeNum(row[17]);     // R열: 선납50%금액
+        item.prepay50_monthly = safeNum(row[18]);   // S열: 선납50%최종
       }
     } else if (period === '72') {
       if (combType === '신규결합') item.price6y_new = finalPrice;

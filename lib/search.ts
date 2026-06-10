@@ -15,6 +15,7 @@ export interface FaqItem {
   urlButton: string;
   url2: string;
   url2ButtonName: string;
+  thumbnail?: string;
   quickButtons?: QuickButton[];
 }
 
@@ -36,6 +37,7 @@ const faqData: FaqItem[] = (rawFaqData as any[]).map(item => {
     urlButton: item.urlButtonName || item.urlButton || '',
     url2: item.url2 || '',
     url2ButtonName: item.url2ButtonName || '',
+    thumbnail: item.thumbnail || '',
     quickButtons: quickButtons.length > 0 ? quickButtons : undefined,
   };
 });

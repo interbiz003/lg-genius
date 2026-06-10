@@ -30,7 +30,7 @@ function makeResponse(item: FaqItem) {
       template: {
         outputs: [{
           basicCard: {
-            thumbnail: { imageUrl: item.url },
+            thumbnail: { imageUrl: item.thumbnail || item.url },
             description,
             buttons,
           },
