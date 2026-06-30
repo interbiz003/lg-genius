@@ -191,20 +191,21 @@ export function formatPriceResponse(item: PriceItem): string {
     lines.push(`⚡ 활성화 금액: ${formatPrice(item.activation)}`);
   }
 
-  if (item.prepayType && item.price6y && item.activation !== null) {
+  if (item.prepayType && item.price6y) {
     const types = item.prepayType.split(',').map(s => s.trim());
     const has30 = types.includes('30');
     const has50 = types.includes('50');
+    const activation = item.activation ?? 0;
 
     lines.push('');
     lines.push('📋 선납 시 (6년 기준)');
 
     if (has30 && item.prepayMin) {
-      const monthly30 = calcPrepayMonthly(item.price6y, item.prepayMin, item.activation);
+      const monthly30 = calcPrepayMonthly(item.price6y, item.prepayMin, activation);
       lines.push(`  • 30% 선납금: ${formatPrice(item.prepayMin)} / 월 ${formatPrice(monthly30)}`);
     }
     if (has50 && item.prepayMax) {
-      const monthly50 = calcPrepayMonthly(item.price6y, item.prepayMax, item.activation);
+      const monthly50 = calcPrepayMonthly(item.price6y, item.prepayMax, activation);
       lines.push(`  • 50% 선납금: ${formatPrice(item.prepayMax)} / 월 ${formatPrice(monthly50)}`);
     }
     if (item.prepayMin && item.prepayMax) {
