@@ -95,10 +95,9 @@ for (const sheetName of sheets) {
         price6y_smb1: null,
         price6y_smb2: null,
         price6y_smb4: null,
-        prepay30_lump: null,
-        prepay30_monthly: null,
-        prepay50_lump: null,
-        prepay50_monthly: null,
+        prepayType: null,
+        prepayMin: null,
+        prepayMax: null,
       };
     }
 
@@ -114,10 +113,10 @@ for (const sheetName of sheets) {
       else if (period === '60') item.price5y = finalPrice;
       else if (period === '72') {
         item.price6y = finalPrice;
-        item.prepay30_lump = safeNum(row[15]);     // P열: 선납30%금액
-        item.prepay30_monthly = safeNum(row[16]);   // Q열: 선납30%최종
-        item.prepay50_lump = safeNum(row[17]);     // R열: 선납50%금액
-        item.prepay50_monthly = safeNum(row[18]);   // S열: 선납50%최종
+        const prepayTypeRaw = String(row[15] || '').trim();   // P열: 선납 가능 정률
+        item.prepayType = prepayTypeRaw || null;
+        item.prepayMin = safeNum(row[16]);                     // Q열: 선납 정액 최소금액
+        item.prepayMax = safeNum(row[17]);                     // R열: 선납 정액 최대금액
       }
     } else if (period === '72') {
       if (combType === '신규결합') item.price6y_new = finalPrice;

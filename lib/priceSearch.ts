@@ -24,10 +24,9 @@ interface PriceItem {
   price6y_smb1: number | null;
   price6y_smb2: number | null;
   price6y_smb4: number | null;
-  prepay30_lump: number | null;
-  prepay30_monthly: number | null;
-  prepay50_lump: number | null;
-  prepay50_monthly: number | null;
+  prepayType: string | null;
+  prepayMin: number | null;
+  prepayMax: number | null;
 }
 
 interface ModelMatch {
@@ -153,6 +152,17 @@ export function formatPrice(price: number | null): string {
   return price.toLocaleString('ko-KR') + '원';
 }
 
+// ═══════════════════════════════════════
+// 선납 후 월구독료 계산
+// ═══════════════════════════════════════
+function calcPrepayMonthly(monthlyPrice: number, prepayAmount: number, activation: number): number {
+  const totalAmount = monthlyPrice * 72;
+  const interestAdjusted = prepayAmount * 1.135;
+  const remaining = totalAmount - interestAdjusted;
+  const monthlyBase = Math.floor((remaining / 72) / 100) * 100;
+  return Math.max(0, monthlyBase - activation);
+}
+
 export function formatPriceResponse(item: PriceItem): string {
   const lines: string[] = [];
 
@@ -181,14 +191,26 @@ export function formatPriceResponse(item: PriceItem): string {
     lines.push(`⚡ 활성화 금액: ${formatPrice(item.activation)}`);
   }
 
-  if (item.prepay30_monthly || item.prepay50_monthly) {
+  if (item.prepayType && item.price6y && item.activation !== null) {
+    const types = item.prepayType.split(',').map(s => s.trim());
+    const has30 = types.includes('30');
+    const has50 = types.includes('50');
+
     lines.push('');
     lines.push('📋 선납 시 (6년 기준)');
-    if (item.prepay30_lump && item.prepay30_monthly) {
-      lines.push(`  • 30%: 선납금 ${formatPrice(item.prepay30_lump)} / 월 ${formatPrice(item.prepay30_monthly)}`);
+
+    if (has30 && item.prepayMin) {
+      const monthly30 = calcPrepayMonthly(item.price6y, item.prepayMin, item.activation);
+      lines.push(`  • 30% 선납금: ${formatPrice(item.prepayMin)} / 월 ${formatPrice(monthly30)}`);
     }
-    if (item.prepay50_lump && item.prepay50_monthly) {
-      lines.push(`  • 50%: 선납금 ${formatPrice(item.prepay50_lump)} / 월 ${formatPrice(item.prepay50_monthly)}`);
+    if (has50 && item.prepayMax) {
+      const monthly50 = calcPrepayMonthly(item.price6y, item.prepayMax, item.activation);
+      lines.push(`  • 50% 선납금: ${formatPrice(item.prepayMax)} / 월 ${formatPrice(monthly50)}`);
+    }
+    if (item.prepayMin && item.prepayMax) {
+      lines.push(`  • 정액 선택: ${formatPrice(item.prepayMin)} ~ ${formatPrice(item.prepayMax)} (10만원 단위)`);
+    } else if (item.prepayMin) {
+      lines.push(`  • 정액 선택: ${formatPrice(item.prepayMin)} (10만원 단위 올림)`);
     }
   }
 
