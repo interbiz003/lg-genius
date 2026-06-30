@@ -155,8 +155,9 @@ export function formatPrice(price: number | null): string {
 // ═══════════════════════════════════════
 // 선납 후 월구독료 계산
 // ═══════════════════════════════════════
-function calcPrepayMonthly(monthlyPrice: number, prepayAmount: number, activation: number): number {
+function calcPrepayMonthly(monthlyPrice: number, rate: number, activation: number): number {
   const totalAmount = monthlyPrice * 72;
+  const prepayAmount = Math.floor((totalAmount * rate) / 100) * 100; // ROUNDDOWN -2와 동일
   const interestAdjusted = prepayAmount * 1.135;
   const remaining = totalAmount - interestAdjusted;
   const monthlyBase = Math.floor((remaining / 72) / 100) * 100;
@@ -201,11 +202,11 @@ export function formatPriceResponse(item: PriceItem): string {
     lines.push('📋 선납 시 (6년 기준)');
 
     if (has30 && item.prepayMin) {
-      const monthly30 = calcPrepayMonthly(item.price6y, item.prepayMin, activation);
+      const monthly30 = calcPrepayMonthly(item.price6y, 0.3, activation);
       lines.push(`  • 30% 선납금: ${formatPrice(item.prepayMin)} / 월 ${formatPrice(monthly30)}`);
     }
     if (has50 && item.prepayMax) {
-      const monthly50 = calcPrepayMonthly(item.price6y, item.prepayMax, activation);
+      const monthly50 = calcPrepayMonthly(item.price6y, 0.5, activation);
       lines.push(`  • 50% 선납금: ${formatPrice(item.prepayMax)} / 월 ${formatPrice(monthly50)}`);
     }
     if (item.prepayMin && item.prepayMax) {
