@@ -113,8 +113,11 @@ for (const sheetName of sheets) {
       else if (period === '60') item.price5y = finalPrice;
       else if (period === '72') {
         item.price6y = finalPrice;
-        const prepayTypeRaw = String(row[15] || '').trim();   // P열: 선납 가능 정률
-        item.prepayType = prepayTypeRaw || null;
+        // P열: 선납 가능 정률 — '30,50' 같은 텍스트가 숫자로 변환되지 않도록 안전하게 문자열 강제
+        const prepayTypeRaw = row[15];
+        item.prepayType = prepayTypeRaw !== null && prepayTypeRaw !== undefined
+          ? String(prepayTypeRaw).trim()
+          : null;
         item.prepayMin = safeNum(row[16]);                     // Q열: 선납 정액 최소금액
         item.prepayMax = safeNum(row[17]);                     // R열: 선납 정액 최대금액
       }
@@ -134,3 +137,10 @@ const allData = Object.values(modelMap);
 const output = { priceDate, items: allData };
 fs.writeFileSync(outputPath, JSON.stringify(output, null, 0), 'utf-8');
 console.log(`[변환 완료] ${allData.length}개 항목 저장됨`);
+
+// 디버그: prepayType이 있는 처음 5개 샘플 출력
+const prepayTypeSamples = allData
+  .filter(it => it.prepayType !== null && it.prepayType !== '')
+  .slice(0, 5)
+  .map(it => ({ model: it.modelFull, prepayType: it.prepayType, prepayMin: it.prepayMin, prepayMax: it.prepayMax }));
+console.log('[디버그] 첫 5개 prepayType 샘플:', prepayTypeSamples);
