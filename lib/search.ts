@@ -31,6 +31,9 @@ const faqData: FaqItem[] = (rawFaqData as any[]).map(item => {
     quickButtons.push({ label: '🏠 처음으로', text: '메인메뉴' });
   }
 
+  // followButtons가 없으면 faq.json에 직접 정의된 quickButtons 사용 (메뉴 타입)
+  const buttons = quickButtons.length > 0 ? quickButtons : (item.quickButtons || []);
+
   return {
     ...item,
     url: item.url || '',
@@ -38,7 +41,7 @@ const faqData: FaqItem[] = (rawFaqData as any[]).map(item => {
     url2: item.url2 || '',
     url2ButtonName: item.url2ButtonName || '',
     thumbnail: item.thumbnail || '',
-    quickButtons: quickButtons.length > 0 ? quickButtons : undefined,
+    quickButtons: buttons.length > 0 ? buttons : undefined,
   };
 });
 
