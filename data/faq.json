@@ -121,10 +121,6 @@
         "text": "국민카드"
       },
       {
-        "label": "롯데카드",
-        "text": "롯데카드"
-      },
-      {
         "label": "신한카드",
         "text": "신한카드"
       },
@@ -140,31 +136,6 @@
   },
   {
     "type": "faq",
-    "question": "롯데카드",
-    "keywords": [
-      "롯데카드",
-      "롯데",
-      "롯데제휴카드",
-      "롯데 제휴카드",
-      "구독엔로카"
-    ],
-    "synonyms": [],
-    "answer": "롯데카드의 혜택, 실적 관련 상세 내용은 아래 이미지를 참조하시기 바랍니다.\n이 외 정확한 실적 인정 항목은 해당 카드사 홈페이지 및 고객센터로 확인이 필요합니다.\n\n전월 실적 확인은 고객센터 및 카드사APP을 통해 확인이 가능합니다.\n※월 실적 인정 기준은 카드 결제일에 상관없이 1일~말일까지 입니다.\n\n롯데카드 고객센터 : 1588-8100",
-    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/7268bcb6d64ad.png",
-    "urlButtonName": "상세내용",
-    "url2": "https://m.lottecard.co.kr/spa/card/booth?bId=96417&vtCdKndC=P15666-A15666",
-    "url2ButtonName": "카드발급",
-    "followButtons": [
-      "신한카드",
-      "국민카드",
-      "우리카드",
-      "우리 플래티넘",
-      "이달의 제휴카드",
-      "실적 구간별 할인"
-    ]
-  },
-  {
-    "type": "faq",
     "question": "신한카드",
     "keywords": [
       "신한카드",
@@ -176,12 +147,11 @@
     ],
     "synonyms": [],
     "answer": "신한카드의 혜택, 실적 관련 상세 내용은 아래 이미지를 참조하시기 바랍니다.\n이 외 정확한 실적 인정 항목은 해당 카드사 홈페이지 및 고객센터로 확인이 필요합니다.\n\n전월 실적 확인은 고객센터 및 카드사APP을 통해 확인이 가능합니다.\n※월 실적 인정 기준은 카드 결제일에 상관없이 1일~말일까지 입니다.\n\n신한카드 고객센터 : 1544-7000",
-    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/4f1938728287f.png",
+    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/6f6f1755d4cc7.png",
     "urlButtonName": "상세내용",
     "url2": "https://www.shinhancard.com/pconts/html/card/apply/credit/1234346_2207.html?EntryLoc2=4441&btnApp=dp1",
     "url2ButtonName": "카드발급",
     "followButtons": [
-      "롯데카드",
       "국민카드",
       "우리카드",
       "우리 플래티넘",
@@ -200,12 +170,11 @@
     ],
     "synonyms": [],
     "answer": "국민카드의 혜택, 실적 관련 상세 내용은 아래 이미지를 참조하시기 바랍니다.\n이 외 정확한 실적 인정 항목은 해당 카드사 홈페이지 및 고객센터로 확인이 필요합니다.\n\n전월 실적 확인은 고객센터 및 카드사APP을 통해 확인이 가능합니다.\n※월 실적 인정 기준은 카드 결제일에 상관없이 1일~말일까지 입니다.\n\n국민카드 고객센터 : 1588-1688",
-    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/fe95aeb23113e.png",
+    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/6f6f1755d4cc7.png",
     "urlButtonName": "상세내용",
     "url2": "https://m.kbcard.com/CRD/DVIEW/MCAMCXHIACRC0002?categoryCode=L0061&cooperationcode=04425&mainCC=a&sGroupCode=1&type=",
     "url2ButtonName": "카드발급",
     "followButtons": [
-      "롯데카드",
       "신한카드",
       "우리카드",
       "우리 플래티넘",
@@ -224,12 +193,11 @@
     ],
     "synonyms": [],
     "answer": "우리카드의 혜택, 실적 관련 상세 내용은 아래 이미지를 참조하시기 바랍니다.\n이 외 정확한 실적 인정 항목은 해당 카드사 홈페이지 및 고객센터로 확인이 필요합니다.\n\n전월 실적 확인은 고객센터 및 카드사APP을 통해 확인이 가능합니다.\n※월 실적 인정 기준은 카드 결제일에 상관없이 1일~말일까지 입니다.\n\n우리카드 고객센터 : 1588-9955",
-    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/5db96882efd17.png",
+    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/f68a5fd3e6852.png",
     "urlButtonName": "상세내용",
     "url2": "https://nm.wooricard.com/dcmw/yh1/crd/crd01/M1CRD101S02.do?cdPrdCd=102535",
     "url2ButtonName": "카드발급",
     "followButtons": [
-      "롯데카드",
       "신한카드",
       "국민카드",
       "우리 플래티넘",
@@ -250,12 +218,11 @@
       "플레"
     ],
     "answer": "우리플레티넘 카드의 혜택, 실적 관련 상세 내용은 아래 이미지를 참조하시기 바랍니다.\n이 외 정확한 실적 인정 항목은 해당 카드사 홈페이지 및 고객센터로 확인이 필요합니다.\n\n전월 실적 확인은 고객센터 및 카드사APP을 통해 확인이 가능합니다.\n※월 실적 인정 기준은 카드 결제일에 상관없이 1일~말일까지 입니다.\n\n우리카드 고객센터 : 1588-9955",
-    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/93fdced992679.png",
+    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/246b9a4ccabc3.png",
     "urlButtonName": "상세내용",
     "url2": "https://m.wooricard.com/dcmw/yh1/crd/crd01/M1CRD101S02.do?recomNo=104169",
     "url2ButtonName": "카드발급",
     "followButtons": [
-      "롯데카드",
       "신한카드",
       "우리카드",
       "국민카드",
@@ -279,7 +246,6 @@
     "url2": "https://www.hyundaicard.com/cpc/cr/CPCCR0201_01.hc?cardWcd=LGEHC&eventCode=LGR03#cardDetailHash",
     "url2ButtonName": "카드발급",
     "followButtons": [
-      "롯데카드",
       "신한카드",
       "국민카드",
       "우리 플래티넘",
@@ -318,7 +284,7 @@
       "할인카드"
     ],
     "answer": "이 달의 제휴카드 판촉이 궁금하시면 버튼을 클릭해주세요.",
-    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/e79a8ecf7356a.png",
+    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/6afbfb0162dd0.png",
     "urlButtonName": "이달의 제휴카드",
     "followButtons": [
       "실적 제외",
@@ -398,7 +364,7 @@
     ],
     "synonyms": [],
     "answer": "고객이 기존에 동일 카드사의 신용카드를 사용중이어도 새롭게 교체/추가 발급 시 신규프로모션 적용 됩니다.\n\n단, 고객이 기존에 사용하던 카드가 '구독 제휴카드'인 경우 신규 프로모션 불가",
-    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/e79a8ecf7356a.png",
+    "url": "https://cdn.imweb.me/upload/S202407200b6b0c77cbd4a/6afbfb0162dd0.png",
     "urlButtonName": "이달의 제휴카드",
     "followButtons": [
       "이달의 제휴카드",
