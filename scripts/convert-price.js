@@ -47,30 +47,60 @@ const safeNum = (val) => {
   return isNaN(n) ? null : Math.round(n);
 };
 
+// 헤더 이름 → 열 인덱스 매핑 (공백/줄바꿈 무시)
+// 컬럼 순서가 바뀌어도(예: 새 컬럼 삽입) 헤더 이름으로 찾기 때문에 깨지지 않음
+const normHeader = (s) => String(s || '').replace(/\s+/g, '').trim();
+
+function buildColumnMap(headerRow, sheetName) {
+  const map = {};
+  headerRow.forEach((h, idx) => {
+    const key = normHeader(h);
+    if (key && !(key in map)) map[key] = idx;
+  });
+
+  const required = [
+    '제품군', '모델명', 'H', 'O', '케어십형태', '케어십구분', '방문주기',
+    '계약기간', '결합유형', '소상공인구분', '활성화', '최종요금',
+    '선납가능정률', '선납정액최소금액', '선납정액최대금액',
+  ];
+  const missing = required.filter(k => !(k in map));
+  if (missing.length > 0) {
+    console.error(`[오류] ${sheetName} 시트에서 다음 컬럼을 찾을 수 없습니다: ${missing.join(', ')} — 원본 엑셀의 헤더명이 바뀌었는지 확인하세요.`);
+  }
+  return map;
+}
+
 for (const sheetName of sheets) {
   const ws = workbook.Sheets[sheetName];
   if (!ws) continue;
 
   const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+  if (rows.length === 0) continue;
+
+  const col = buildColumnMap(rows[0], sheetName);
+  const get = (row, headerName) => {
+    const idx = col[headerName];
+    return idx === undefined ? null : row[idx];
+  };
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    if (!row || !row[1]) continue;
+    if (!row || !get(row, '모델명')) continue;
 
-    const modelFull = String(row[1] || '').trim();
+    const modelFull = String(get(row, '모델명') || '').trim();
     if (!modelFull) continue;
 
-    const product = String(row[0] || '').trim();
-    const hiPlazaVal = String(row[2] || '').trim().toUpperCase();
-    const dotcomVal = String(row[3] || '').trim();
+    const product = String(get(row, '제품군') || '').trim();
+    const hiPlazaVal = String(get(row, 'H') || '').trim().toUpperCase();
+    const dotcomVal = String(get(row, 'O') || '').trim();
     const isHiPlaza = hiPlazaVal === 'H';
     const isDotcom = dotcomVal === 'O' || dotcomVal === 'o' || dotcomVal === 'ㅇ';
-    const careType = String(row[4] || '').trim();
-    const careDetail = String(row[5] || '').trim();
-    const visitCycle = String(row[6] || '').trim();
-    const period = String(row[7] || '').trim();
-    const combType = String(row[8] || '').trim();
-    const smbDetail = String(row[9] || '').trim();   // J열: 소상공인구분
+    const careType = String(get(row, '케어십형태') || '').trim();
+    const careDetail = String(get(row, '케어십구분') || '').trim();
+    const visitCycle = String(get(row, '방문주기') || '').trim();
+    const period = String(get(row, '계약기간') || '').trim();
+    const combType = String(get(row, '결합유형') || '').trim();
+    const smbDetail = String(get(row, '소상공인구분') || '').trim();
 
     const careCombined = [careType, careDetail, visitCycle].filter(v => v).join(' > ');
     const key = `${modelFull}|${careCombined}`;
@@ -102,8 +132,8 @@ for (const sheetName of sheets) {
     }
 
     const item = modelMap[key];
-    const finalPrice = safeNum(row[14]);     // O열: 최종요금
-    const activation = safeNum(row[13]);     // N열: 활성화
+    const finalPrice = safeNum(get(row, '최종요금'));
+    const activation = safeNum(get(row, '활성화'));
 
     if (combType === '결합없음') {
       if (activation) item.activation = activation;
@@ -113,13 +143,13 @@ for (const sheetName of sheets) {
       else if (period === '60') item.price5y = finalPrice;
       else if (period === '72') {
         item.price6y = finalPrice;
-        // P열: 선납 가능 정률 — '30,50' 같은 텍스트가 숫자로 변환되지 않도록 안전하게 문자열 강제
-        const prepayTypeRaw = row[15];
+        // 선납 가능 정률 — '30,50' 같은 텍스트가 숫자로 변환되지 않도록 안전하게 문자열 강제
+        const prepayTypeRaw = get(row, '선납가능정률');
         item.prepayType = prepayTypeRaw !== null && prepayTypeRaw !== undefined
           ? String(prepayTypeRaw).trim()
           : null;
-        item.prepayMin = safeNum(row[16]);                     // Q열: 선납 정액 최소금액
-        item.prepayMax = safeNum(row[17]);                     // R열: 선납 정액 최대금액
+        item.prepayMin = safeNum(get(row, '선납정액최소금액'));
+        item.prepayMax = safeNum(get(row, '선납정액최대금액'));
       }
     } else if (period === '72') {
       if (combType === '신규결합') item.price6y_new = finalPrice;
