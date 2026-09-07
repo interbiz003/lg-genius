@@ -3,9 +3,37 @@ import { searchFaq, findByQuestion, findMenuByKeyword, FaqItem } from '../../../
 import { searchPrice, formatPriceResponse, looksLikeModelName } from '../../../lib/priceSearch';
 
 // ═══════════════════════════════════════
+// 카드 썸네일
+// ═══════════════════════════════════════
+
+// url이 이미지가 아닌 웹페이지 링크일 때 대신 보여줄 대표 이미지 (public/ 에 위치).
+// 비우면 이미지 없이 카드만 나갑니다.
+const DEFAULT_THUMBNAIL_PATH = '/default_profile.png';
+
+// 카카오는 절대 URL만 받으므로 요청이 들어온 도메인을 붙여서 만든다.
+// 도메인을 코드에 박지 않아 프리뷰 배포나 도메인 변경에도 그대로 동작함.
+function originOf(request: NextRequest): string {
+  const host = request.headers.get('host');
+  if (!host) return '';
+  return `${request.headers.get('x-forwarded-proto') || 'https'}://${host}`;
+}
+
+const isImageUrl = (u?: string) => !!u && /\.(png|jpe?g|gif|webp)(\?|$)/i.test(u.trim());
+
+// 항목 자체의 이미지(thumbnail → url)를 먼저 쓰고, 없으면 대표 이미지로 대체
+function pickThumbnail(item: FaqItem, origin: string): string {
+  const own = [item.thumbnail, item.url].find(isImageUrl)?.trim();
+  if (own) return own;
+  return origin && DEFAULT_THUMBNAIL_PATH ? origin + DEFAULT_THUMBNAIL_PATH : '';
+}
+
+// 카카오 basicCard 설명 한도. 넘으면 답변 전문을 simpleText로 따로 보냄
+const CARD_DESC_LIMIT = 230;
+
+// ═══════════════════════════════════════
 // 응답 생성 (faq.json quickButtons 기반)
 // ═══════════════════════════════════════
-function makeResponse(item: FaqItem) {
+function makeResponse(item: FaqItem, origin: string) {
   const quickReplies = (item.quickButtons || []).map(btn => ({
     messageText: btn.text,
     action: 'message' as const,
@@ -18,23 +46,27 @@ function makeResponse(item: FaqItem) {
   // URL 1개 이상 → BasicCard (thumbnail + 링크 버튼 1~2개)
   if (hasUrl1) {
     const truncateLabel = (s: string) => s.length > 14 ? s.substring(0, 13) + '..' : s;
-    const description = item.answer.length > 230 ? item.answer.substring(0, 227) + '...' : item.answer;
     const buttons = [
       { label: truncateLabel(item.urlButton || '상세보기'), action: 'webLink', webLinkUrl: item.url },
     ];
     if (hasUrl2) {
       buttons.push({ label: truncateLabel(item.url2ButtonName || '상세보기'), action: 'webLink', webLinkUrl: item.url2 });
     }
+
+    const thumb = pickThumbnail(item, origin);
+    const card: any = { buttons };
+    if (thumb) card.thumbnail = { imageUrl: thumb };
+
+    // 답변이 카드 설명 한도를 넘으면 전문을 simpleText로 먼저 보내고
+    // 카드는 이미지와 링크 버튼만 담당 → 답변이 잘리지 않음
+    const outputs = item.answer.length > CARD_DESC_LIMIT
+      ? [{ simpleText: { text: item.answer } }, { basicCard: card }]
+      : [{ basicCard: { ...card, description: item.answer } }];
+
     return {
       version: '2.0',
       template: {
-        outputs: [{
-          basicCard: {
-            thumbnail: { imageUrl: item.thumbnail || item.url },
-            description,
-            buttons,
-          },
-        }],
+        outputs,
         ...(quickReplies.length > 0 ? { quickReplies } : {}),
       },
     };
@@ -121,7 +153,7 @@ function priceStepResponse(utterance: string) {
 // ═══════════════════════════════════════
 // FAQ 검색 결과 응답
 // ═══════════════════════════════════════
-function searchResultResponse(query: string) {
+function searchResultResponse(query: string, origin: string) {
   const results = searchFaq(query);
 
   if (results.length === 0) {
@@ -139,7 +171,7 @@ function searchResultResponse(query: string) {
   const best = results[0];
 
   if (best.score >= 30) {
-    return makeResponse(best.item);
+    return makeResponse(best.item, origin);
   }
 
   if (results.length >= 2) {
@@ -159,7 +191,7 @@ function searchResultResponse(query: string) {
     }
   }
 
-  return makeResponse(best.item);
+  return makeResponse(best.item, origin);
 }
 
 // ═══════════════════════════════════════
@@ -167,30 +199,31 @@ function searchResultResponse(query: string) {
 // ═══════════════════════════════════════
 export async function POST(request: NextRequest) {
   try {
+    const origin = originOf(request);
     const body = await request.json();
     const utterance = body?.userRequest?.utterance?.trim() || '';
     if (!utterance) {
       const main = findByQuestion('메인메뉴');
-      return NextResponse.json(main ? makeResponse(main) : makeTextResponse('안녕하세요!'));
+      return NextResponse.json(main ? makeResponse(main, origin) : makeTextResponse('안녕하세요!'));
     }
 
     // 1. question 정확 일치 (버튼 클릭)
     const exactMatch = findByQuestion(utterance);
     if (exactMatch) {
-      return NextResponse.json(makeResponse(exactMatch));
+      return NextResponse.json(makeResponse(exactMatch, origin));
     }
 
     // 2. 메인메뉴 키워드
     const menuKeywords = ['처음으로', '홈', '시작', '도움말'];
     if (menuKeywords.includes(utterance)) {
       const main = findByQuestion('메인메뉴');
-      return NextResponse.json(main ? makeResponse(main) : makeTextResponse('안녕하세요!'));
+      return NextResponse.json(main ? makeResponse(main, origin) : makeTextResponse('안녕하세요!'));
     }
 
     // 3. 메뉴 키워드 매칭 (카드사, 카테고리 등)
     const menuMatch = findMenuByKeyword(utterance);
     if (menuMatch) {
-      return NextResponse.json(makeResponse(menuMatch));
+      return NextResponse.json(makeResponse(menuMatch, origin));
     }
 
     // 4. 가격 단계별 조회
@@ -206,7 +239,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. FAQ 키워드 검색
-    return NextResponse.json(searchResultResponse(utterance));
+    return NextResponse.json(searchResultResponse(utterance, origin));
 
   } catch (error) {
     console.error('Chatbot API error:', error);

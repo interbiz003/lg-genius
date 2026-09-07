@@ -27,7 +27,8 @@ const faqData: FaqItem[] = (rawFaqData as any[]).map(item => {
   }));
 
   // 처음으로 버튼 자동 추가
-  if (item.type === 'faq' && quickButtons.length > 0) {
+  // 후속버튼이 없는 항목에도 붙여야 사용자가 막다른 화면에 갇히지 않음
+  if (item.type === 'faq') {
     quickButtons.push({ label: '🏠 처음으로', text: '메인메뉴' });
   }
 
