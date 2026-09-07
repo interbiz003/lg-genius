@@ -9,26 +9,44 @@ const path = require('path');
 const dataDir = path.join(__dirname, '..', 'data');
 const outputPath = path.join(dataDir, 'price-data.json');
 
-// price_ 또는 Master_ 로 시작하는 xlsx 파일 자동 탐색
-const files = fs.readdirSync(dataDir);
-const priceFile = files.find(f => (f.startsWith('price_') || f.startsWith('Master_')) && f.endsWith('.xlsx'));
+// 파일명에서 날짜 추출 → YYYYMMDD로 정규화 (6자리는 20xx로 보정)
+function parseFileDate(filename) {
+  const m = filename.match(/(\d{6,8})/);
+  if (!m) return null;
+  const d = m[1];
+  if (d.length === 8) return d;
+  if (d.length === 6) return '20' + d;
+  return null;
+}
 
-if (!priceFile) {
+// price_ 또는 Master_ 로 시작하는 xlsx 파일 자동 탐색
+// 여러 개가 있으면 파일명 날짜가 가장 최신인 것을 사용 (옛 파일을 지우지 않아도 됨)
+const candidates = fs.readdirSync(dataDir)
+  .filter(f => (f.startsWith('price_') || f.startsWith('Master_')) && f.endsWith('.xlsx'))
+  .map(f => ({ name: f, date: parseFileDate(f) }))
+  .sort((a, b) => {
+    if (a.date && b.date) return b.date.localeCompare(a.date);  // 최신 날짜 우선
+    if (a.date) return -1;   // 날짜 없는 파일은 후순위
+    if (b.date) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+if (candidates.length === 0) {
   console.error('[오류] price_*.xlsx 또는 Master_*.xlsx 파일을 찾을 수 없습니다');
   process.exit(1);
 }
 
-// 파일명에서 날짜 추출
-const dateMatch = priceFile.match(/(\d{6,8})/);
-let priceDate = '';
-if (dateMatch) {
-  const d = dateMatch[1];
-  if (d.length === 8) {
-    priceDate = `${d.substring(0,4)}년 ${d.substring(4,6)}월 ${d.substring(6,8)}일`;
-  } else {
-    priceDate = `20${d.substring(0,2)}년 ${d.substring(2,4)}월 ${d.substring(4,6)}일`;
-  }
+const priceFile = candidates[0].name;
+const fileDate = candidates[0].date;
+
+if (candidates.length > 1) {
+  console.log(`[안내] 가격표 파일 ${candidates.length}개 발견 → 최신 날짜 사용`);
+  console.log(`[안내] 미사용: ${candidates.slice(1).map(c => c.name).join(', ')}`);
 }
+
+const priceDate = fileDate
+  ? `${fileDate.substring(0,4)}년 ${fileDate.substring(4,6)}월 ${fileDate.substring(6,8)}일`
+  : '';
 
 console.log(`[변환 시작] ${priceFile} → price-data.json`);
 if (priceDate) console.log(`[기준일자] ${priceDate}`);

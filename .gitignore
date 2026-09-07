@@ -3,3 +3,6 @@ node_modules/
 .env
 .env.local
 *.log
+
+# 빌드 시 convert-price.js가 엑셀에서 자동 생성 (커밋 불필요)
+data/price-data.json
